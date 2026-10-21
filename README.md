@@ -4,7 +4,7 @@ Here is a comprehensive, production-ready `README.md` tailored specifically for 
 # Autonomous Driving Vehicle (ADV) Event Reporting Incident (ERI) Description Writer
 
 **Current Version:** v10  
-**Primary Maintainer:** Brittany Reath (`reathb@google.com`)  
+**Primary Maintainer:** reathb
 **Platform:** Google Sheets & Google Apps Script  
 **Integration Targets:** Salesforce Service Cloud / Lightning (`lightning.force.com`), Contact Center Player (`contactcenter.corp.google.com`), Internal Safety & Ticketing Systems
 
