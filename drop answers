@@ -178,3 +178,45 @@ N/A
 24c. Were there any TOS violations? (C67)
 Yes
 No
+
+(Note: Fields 0, 4b, 5, 9a, 20a, 23, 24a, and 24b are free-text input cells rather than dropdowns).
+
+Here are the questions and prompt texts corresponding to those fields from the form:  * **Field 0**: Location:
+  * **Field 4b**: What did they do?
+  * **Field 5**: This caused the ADV to...
+  * **Field 9a**: If yes, why was 911 called?
+  * **Field 20a**: Describe the damage:
+  * **Field 23**: ORU license plate:
+  * **Field 24a**: Call link:
+  * **Field 24b**: Case notes link:-----**Assumptions Made:**  * The field identifiers (0, 4b, 5, 9a, 20a, 23, 24a, 24b) directly correspond to the numbers listed in column A of the main form sheet.
+
+Description:
+There were riders present when the event occurred,on the rider's trip. Prior to the event the ADV was operating at 0-3 MPH in middle lanes, moving straight. The incident was initiated when VRU touched ADV while passing on bicycle. The event caused the ADV to remain stationary. This resulted in contact to the Left region(s). Following the interaction, WRA was dispatched and Tow was required Emergency services were not called. The trip continued to the destination. No financial accommodations were required. The ADV continued on its mission. The incident resulted in zero damage.  
+
+
+Location: 2301 Stockton St, San Francisco, CA 94133
+Was emergency services called: No
+If Yes: State the reason for the call: N/A
+Rider(s): Yes
+Injuries: No rider present
+If Yes: State who was injured: N/A
+If Yes: State severity: N/A
+Rider(s) Resolution: Rider(s) Continued Trip
+Damage: No
+If Yes: Details: N/A
+ADV Resolution: continued mission
+*License Plate (ORU): UNKNOWN gwbwrgb
+*Call Link: https://contactcenter.corp.google.com/quality/player/?recording_id=P2000000001183583987
+*Case ID: https://waymopospend.lightning.force.com/lightning/r/Case/500Ke00000SRswTIAT/view
+
+
+
+
+Summary of the event :
+
+Was the trip waived? No
+Was the trip canceled? No
+Were promo credits issued? No
+Was WRA recovery required? Yes
+Any identified rider violations? No
+Was Supervisor Follow Up requested by rider? No
