@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Narrative Wizard</title>
+    <style>
+        body { background-color: #4a4a4a; color: #ffffff; font-family: sans-serif; margin: 0; padding: 24px; display: flex; justify-content: center; }
+        .app-container { background-color: #5a5a5a; width: 100%; max-width: 900px; border: 1px solid #777777; border-radius: 8px; padding: 24px; box-sizing: border-box; }
+        .card-bg { background-color: #404040; border: 1px solid #666666; border-radius: 4px; padding: 32px; text-align: center; margin-bottom: 24px; }
+        .question-title { font-size: 24px; font-weight: 300; margin-top: 0; margin-bottom: 24px; }
+        .text-cyan-accent { color: #00d2ff; font-weight: 600; }
+        .wizard-input { width: 100%; background-color: #2a2a2a; border: 1px solid #666666; border-radius: 4px; padding: 12px; font-size: 16px; color: #e0e0e0; box-sizing: border-box; margin-bottom: 24px; }
+        .wizard-input:focus { outline: none; border-color: #00d2ff; }
+        .next-btn { background-color: #00d2ff; color: #111111; border: none; font-size: 18px; padding: 10px 48px; cursor: pointer; }
+        .workspace { border: 1px solid #666666; border-radius: 4px; padding: 16px; min-height: 200px; background-color: rgba(50, 50, 50, 0.2); }
+        .workspace-title { font-size: 12px; color: #aaaaaa; text-transform: uppercase; margin-bottom: 12px; }
+        .blocks-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        .block-nav-btn { background-color: #1a4f5a; border: 1px solid #00d2ff; color: #00d2ff; padding: 8px 16px; font-size: 14px; border-radius: 4px; cursor: pointer; text-align: left; }
+        .block-editing { background-color: #246e7d; border: 2px solid #ffffff; font-weight: bold; }
+        .blinking-cursor { width: 2px; height: 24px; background-color: #00d2ff; display: inline-block; margin-top: 16px; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="card-bg">
+            <h2 id="questionTitle" class="question-title"></h2>
+            <input type="text" id="wizardInput" class="wizard-input">
+            <br>
+            <button id="nextBtn" class="next-btn">Next</button>
+        </div>
+
+        <div class="workspace">
+            <div class="workspace-title">Click any block to edit that section:</div>
+            <div id="blocksContainer" class="blocks-container"></div>
+            <span class="blinking-cursor"></span>
+        </div>
+    </div>
+
+    <script>
+        let actorType = "ped";
+        let currentStepIndex = 7; 
+
+        const stepDefinitions = [
+            { id: "presence", question: () => "Were riders present?", def: "There were riders present when the event occurred" },
+            { id: "tripType", question: () => "What type of trip was it?", def: "on the rider's trip" },
+            { id: "speed", question: () => "What was the ADV speed?", def: "Prior to the event the ADV was operating at 0-3 MPH" },
+            { id: "lane", question: () => "What was the lane position?", def: "in the middle lane" },
+            { id: "motion", question: () => "What was the vehicle motion status?", def: "moving forward" },
+            { id: "direction", question: () => "What was the travel heading?", def: "moving straight" },
+            { 
+                id: "actor", 
+                question: () => "Who was the dynamic actor involved?", 
+                def: "The incident was initiated when a ped",
+                onSave: (val) => {
+                    if (val.toLowerCase().includes("ped")) actorType = "ped";
+                    else if (val.toLowerCase().includes("bicycle")) actorType = "bicycle";
+                    else if (val.toLowerCase().includes("vehicle")) actorType = "vehicle";
+                }
+            },
+            { id: "action", question: () => `What did the <span class="text-cyan-accent">${actorType}</span> do?`, def: "ran into the ADV" }
+        ];
+
+        const userAnswers = stepDefinitions.map(s => s.def);
+
+        const questionTitle = document.getElementById('questionTitle');
+        const wizardInput = document.getElementById('wizardInput');
+        const nextBtn = document.getElementById('nextBtn');
+        const blocksContainer = document.getElementById('blocksContainer');
+
+        function renderBlocks() {
+            blocksContainer.innerHTML = '';
+            userAnswers.forEach((text, index) => {
+                if (!text) return;
+                const btn = document.createElement('button');
+                btn.className = 'block-nav-btn' + (index === currentStepIndex ? ' block-editing' : '');
+                btn.innerHTML = text;
+                btn.onclick = () => { currentStepIndex = index; loadStep(); };
+                blocksContainer.appendChild(btn);
+            });
+        }
+
+        function loadStep() {
+            if (currentStepIndex < stepDefinitions.length) {
+                const currentStep = stepDefinitions[currentStepIndex];
+                questionTitle.innerHTML = currentStep.question();
+                wizardInput.value = userAnswers[currentStepIndex] || "";
+                wizardInput.focus();
+            } else {
+                questionTitle.innerHTML = "Sequence Complete!";
+                wizardInput.value = "";
+            }
+            renderBlocks();
+        }
+
+        function handleNext() {
+            const value = wizardInput.value.trim();
+            if (value && currentStepIndex < stepDefinitions.length) {
+                userAnswers[currentStepIndex] = value;
+                if (stepDefinitions[currentStepIndex].onSave) {
+                    stepDefinitions[currentStepIndex].onSave(value);
+                }
+                currentStepIndex++;
+                loadStep();
+            }
+        }
+
+        nextBtn.addEventListener('click', handleNext);
+        wizardInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleNext(); });
+
+        loadStep();
+    </script>
+</body>
+</html>
