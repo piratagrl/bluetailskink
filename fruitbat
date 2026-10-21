@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADV Incident Ingestion Wizard</title>
+    <style>
+        :root {
+            --bg-main: #141419;
+            --bg-panel: #22222a;
+            --bg-card: #2e2e38;
+            --text-main: #f0f0f5;
+            --text-muted: #a0a0b0;
+            --accent-mint: #00fa9a;
+            --accent-blue: #00bfff;
+            
+            /* Visual Audit Theme Matrix Colors */
+            --color-standard-green: #11734b;
+            --color-uber-green: #166c3b;
+            --color-light-green: #2e7d32;
+            --color-yellow: #fbc02d;
+            --color-orange: #f57c00;
+            --color-light-pink: #d32f2f;
+            --color-dark-red: #8b0000;
+            --color-purple: #7b1fa2;
+            --color-bright-blue: #1976d2;
+            --color-dark-teal: #00796b;
+            --color-brown-olive: #556b2f;
+            --color-gold: #d4af37;
+            --color-dark-gray: #555555;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .panel {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            border: 1px solid #333340;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.3rem;
+            color: var(--text-main);
+            border-bottom: 1px solid #3d3d4d;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .wizard-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            border-top: 1px solid #3d3d4d;
+            padding-top: 20px;
+        }
+
+        .btn {
+            background-color: #3e3e4d;
+            color: var(--text-main);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #4e4e5d;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: #141419;
+        }
+
+        .btn-primary:hover {
+            background-color: #33ccff;
+        }
+
+        .btn-copy {
+            background-color: #bcd4e6;
+            color: #101820;
+            font-weight: bold;
+            width: 100%;
+            padding: 16px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-copy:hover {
+            background-color: #a3c1ad;
+        }
+
+        .wizard-card {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .wizard-card.active {
+            display: flex;
+        }
+        
+        /* Lines 138-142: Hide headers/labels to prevent operator distraction */
+        .wizard-card h2, 
+        .wizard-card label {
+            display: none !important;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: var(--bg-card);
+            border: 2px solid transparent;
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            color: var(--text-main);
+            transition: all 0.15s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .option-btn:hover {
+            background-color: #3d3d4d;
+            border-color: var(--text-muted);
+        }
+
+        .option-btn.selected {
+            border-color: var(--accent-mint);
+            background-color: #243a32;
+        }
+
+        .input-text {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--bg-card);
+            border: 1px solid #444455;
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .input-text:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .spinner-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: var(--bg-card);
+            padding: 10px 20px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        .spinner-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            background-color: #444455;
+            color: var(--text-main);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner-btn:hover {
+            background-color: #555566;
+        }
+
+        .spinner-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            width: 50px;
+            text-align: center;
+        }
+
+        .car-wireframe-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .car-svg {
+            width: 240px;
+            height: 380px;
+        }
+
+        .car-region {
+            fill: #3e3e4d;
+            stroke: #141419;
+            stroke-width: 2;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .car-region:hover {
+            fill: var(--accent-blue);
+        }
+
+        .car-region.selected {
+            fill: var(--accent-mint);
+        }
+
+        .car-label {
+            fill: var(--text-main);
+            font-size: 12px;
+            font-weight: bold;
+            pointer-events: none;
+            text-anchor: middle;
+        }
+
+        .preview-box {
+            background-color: #4a4a4a;
+            color: #ffffff;
+            font-family: "Courier New", Courier, monospace;
+            padding: 22px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            border: 1px solid #5a5a5a;
+        }
+
+        .preview-clickable-fragment {
+            cursor: pointer;
+            border-bottom: 1px dashed transparent;
+            padding: 1px 2px;
+            border-radius: 3px;
+            display: inline;
+        }
+
+        .preview-clickable-fragment:hover {
+            background-color: rgba(255,255,255,0.2);
+            border-bottom-color: #fff;
+        }
+
+        .override-panel {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #444455;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .hint-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: -4px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="panel">
+        <h2 id="card-title-header">Question Base</h2>
+                <!-- Q0: Location Data -->
+        <div class="wizard-card active" id="card-q0">
+            <label for="input-location">Location String Input:</label>
+            <div class="hint-text">Format Hint: 1080 west addison, chicago, il</div>
+            <input type="text" id="input-location" class="input-text" placeholder="1080 west addison, chicago, il">
+        </div>
+
+        <!-- Q1: Rider Fleet Ingestion -->
+        <div class="wizard-card" id="card-q1">
+            <label>Was there a rider present in the vehicle?</label>
+            <div class="options-grid" id="grid-q1"></div>
+        </div>
+
+        <!-- Q2: Mission Timeline Status -->
+        <div class="wizard-card" id="card-q2">
+            <label>When in the trip did this incident occur?</label>
+            <div class="options-grid" id="grid-q2"></div>
+        </div>
+
+        <!-- Q3: Speed and Lane Parameters Matrix -->
+        <div class="wizard-card" id="card-q3">
+            <label>ADV Operating Speed:</label>
+            <div class="spinner-container">
+                <button class="spinner-btn" onclick="adjustSpeed(-1)">-</button>
+                <div class="spinner-value" id="spinner-speed-val">0</div>
+                <button class="spinner-btn" onclick="adjustSpeed(1)">+</button>
+                <span>MPH</span>
+            </div>
+            
+            <label style="margin-top:20px; display:block;">Lane Positioning Profile:</label>
+            <div class="options-grid" id="grid-q3b"></div>
+
+            <label style="margin-top:20px; display:block;">Direction / Activity Trajectory:</label>
+            <div class="options-grid" id="grid-q3c"></div>
+        </div>
+
+        <!-- Q4a: External Catalyst Definition -->
+        <div class="wizard-card" id="card-q4a">
+            <label>What was the external trigger or third-party agent?</label>
+            <div class="options-grid" id="grid-q4a"></div>
+        </div>
+
+        <!-- Q4b: Action Parameter Ingestion -->
+        <div class="wizard-card" id="card-q4b">
+            <label id="label-q4b">What did the agent do?</label>
+            <input type="text" id="input-q4b" class="input-text" placeholder="e.g., cut off ADV suddenly">
+        </div>
+
+        <!-- Q5: ADV Trajectory Anomaly Manifest -->
+        <div class="wizard-card" id="card-q5">
+            <label>What did this cause the ADV to do?</label>
+            <input type="text" id="input-q5" class="input-text" value="remain stationary">
+        </div>
+
+        <!-- Q6: Top-Down Visual Asset Damage Wireframe Component -->
+        <div class="wizard-card" id="card-q6">
+            <label>What was the immediate physical contact point?</label>
+            <div class="car-wireframe-container">
+                <div class="options-grid" style="width:100%; margin-bottom: 10px;">
+                    <button class="option-btn selected" id="btn-wireframe-nocontact" onclick="setWireframeNoContact()">No Contact</button>
+                    <button class="option-btn" id="btn-wireframe-interior" onclick="toggleWireframeRegion('interior')">Interior</button>
+                </div>
+                
+                <svg class="car-svg" viewBox="0 0 200 340">
+                    <rect x="50" y="30" width="100" height="280" rx="30" fill="#2d2d35" stroke="#555" stroke-width="3" />
+                    <path id="wf-front" class="car-region" d="M 50 60 Q 100 20 150 60 L 150 90 L 50 90 Z" onclick="toggleWireframeRegion('front')" />
+                    <path id="wf-left" class="car-region" d="M 50 90 L 80 90 L 80 250 L 50 250 Z" onclick="toggleWireframeRegion('left')" />
+                    <path id="wf-right" class="car-region" d="M 120 90 L 150 90 L 150 250 L 120 250 Z" onclick="toggleWireframeRegion('right')" />
+                    <path id="wf-window" class="car-region" d="M 80 110 L 120 110 L 120 170 L 80 170 Z" onclick="toggleWireframeRegion('window')" />
+                    <path id="wf-top" class="car-region" d="M 80 170 L 120 170 L 120 230 L 80 230 Z" onclick="toggleWireframeRegion('top')" />
+                    <path id="wf-back" class="car-region" d="M 50 250 L 150 250 L 150 280 Q 100 320 50 280 Z" onclick="toggleWireframeRegion('back')" />
+                    <path id="wf-undercarriage" class="car-region" d="M 50 30 Q 100 0 150 30 L 150 50 L 50 50 Z" onclick="toggleWireframeRegion('undercarriage')" />
+
+                    <text x="100" y="55" class="car-label">FRONT</text>
+                    <text x="40" y="165" class="car-label" transform="rotate(-90 40 165)">LEFT SIDE</text>
+                    <text x="160" y="165" class="car-label" transform="rotate(90 160 165)">RIGHT SIDE</text>
+                    <text x="100" y="145" class="car-label">WINDOW</text>
+                    <text x="100" y="295" class="car-label">BACK</text>
+                    <text x="100" y="215" class="car-label" style="font-size:10px;">TOP</text>
+                    <text x="100" y="28" class="car-label" style="font-size:8px;">UNDER</text>
+                </svg>
+            </div>
+        </div>
+        <!-- Q7: Post Incident ADV Recovery State -->
+        <div class="wizard-card" id="card-q7">
+            <label>What was the post-incident status of the ADV?</label>
+            <div class="options-grid" id="grid-q7"></div>
+        </div>
+
+        <!-- Q8: Law Enforcement On-Scene Engagement Metric -->
+        <div class="wizard-card" id="card-q8">
+            <label>Did an agent or safety driver speak with Law Enforcement Officers (LEO) on the scene?</label>
+            <div class="options-grid" id="grid-q8"></div>
+        </div>
+
+        <!-- Q9: 911 Trigger Manifest -->
+        <div class="wizard-card" id="card-q9">
+            <label>Was 911 called?</label>
+            <div class="options-grid" id="grid-q9"></div>
+        </div>
+
+        <!-- Q9b: 911 Call Escalation Parameters Ingestion -->
+        <div class="wizard-card" id="card-q9b">
+            <label>Why was 911 called?</label>
+            <input type="text" id="input-q9b" class="input-text" placeholder="e.g., medical assistance requested for external party">
+        </div>
+
+        <!-- Q10: ERT Maneuver Verification -->
+        <div class="wizard-card" id="card-q10">
+            <label>Did ERT suggest a maneuver to the ADV?</label>
+            <div class="options-grid" id="grid-q10"></div>
+        </div>
+
+        <!-- Q11: Remote Safety Hold Assertion -->
+        <div class="wizard-card" id="card-q11">
+            <label>Was a remote or safety hold placed on the ADV following the incident?</label>
+            <div class="options-grid" id="grid-q11"></div>
+        </div>
+
+        <!-- Q13: External Agent Post Incident Track Status -->
+        <div class="wizard-card" id="card-q13">
+            <label>What did the ORU or VRU do immediately following the interaction?</label>
+            <div class="options-grid" id="grid-q13"></div>
+        </div>
+
+        <!-- Q12: Insurance Settlement Log -->
+        <div class="wizard-card" id="card-q12">
+            <label>Did ERT exchange insurance information with the Other Road User (ORU)?</label>
+            <div class="options-grid" id="grid-q12"></div>
+        </div>
+
+        <!-- Q15: External Demographic Injury Profile Assessment -->
+        <div class="wizard-card" id="card-q15">
+            <label>What was the injury status of the Other Road User (ORU) or Vulnerable Road User (VRU)?</label>
+            <div class="options-grid" id="grid-q15"></div>
+        </div>
+
+        <!-- Q14: Internal Demographic Asset Trauma Profiling -->
+        <div class="wizard-card" id="card-q14">
+            <label id="label-q14">What was the injury status of the rider?</label>
+            <div class="options-grid" id="grid-q14"></div>
+        </div>
+
+        <!-- Q16: Passenger Self Preservation Requests Tracker -->
+        <div class="wizard-card" id="card-q16">
+            <label>What immediate actions did the rider request due to feeling unsafe? (Select all that apply)</label>
+            <div class="options-grid" id="grid-q16"></div>
+        </div>
+
+        <!-- Q17: Mission Resolution Pipeline State -->
+        <div class="wizard-card" id="card-q17">
+            <label>How did the rider officially conclude their trip?</label>
+            <div class="options-grid" id="grid-q17"></div>
+        </div>
+
+        <!-- Q18: Financial Compensation Model Manifest -->
+        <div class="wizard-card" id="card-q18">
+            <label>What specific promotions or compensation were applied to the rider's account?</label>
+            <div class="options-grid" id="grid-q18"></div>
+        </div>
+        <!-- Q19: Asset Physical Resolution Manifest -->
+        <div class="wizard-card" id="card-q19">
+            <label>What was the physical resolution and destination for the ADV immediately after the event?</label>
+            <div class="options-grid" id="grid-q19"></div>
+        </div>
+
+        <!-- Q20: Damage Categorization Matrix -->
+        <div class="wizard-card" id="card-q20">
+            <label>ADV Damage Classification:</label>
+            <div class="options-grid" id="grid-q20"></div>
+        </div>
+
+        <!-- Q20b: Structural Damage Descriptive Details -->
+        <div class="wizard-card" id="card-q20b">
+            <label>State the damage details:</label>
+            <input type="text" id="input-q20b" class="input-text" placeholder="e.g., minor scuff marks on the front lower bumper casing">
+        </div>
+
+        <!-- Q21: Regional Airport Jurisdiction Clearance Check -->
+        <div class="wizard-card" id="card-q21">
+            <label>Was AZ DPS/ Sky Harbor GTO called?</label>
+            <div class="options-grid" id="grid-q21"></div>
+        </div>
+
+        <!-- Q23: ORU License Plate Tracking Parameters -->
+        <div class="wizard-card" id="card-q23">
+            <label style="font-weight:bold; margin-bottom:4px; display:block;">ORU LP STATE:</label>
+            <select id="select-q23-state" class="input-text" onchange="handlePlateStateChange()">
+                <option value="N/A">N/A</option>
+                <option value="UNKNOWN">UNKNOWN</option>
+                <option value="AZ">AZ</option>
+                <option value="CA">CA</option>
+                <option value="TX">TX</option>
+                <option value="NV">NV</option>
+                <option value="IL">IL</option>
+            </select>
+            
+            <div id="wrapper-q23-plate" style="margin-top: 15px; display: none;">
+                <label style="font-weight:bold; margin-bottom:4px; display:block;">ORU license plate:</label>
+                <input type="text" id="input-q23-plate" class="input-text" style="text-transform: uppercase;" placeholder="GWBWRGB">
+            </div>
+        </div>
+
+        <!-- Q24: Escalation Log Pipeline Integration Matrix -->
+        <div class="wizard-card" id="card-q24">
+            <label>Did you speak to the rider?</label>
+            <div class="options-grid" id="grid-q24"></div>
+            
+            <div id="wrapper-q24-links" style="margin-top:15px; display:none; flex-direction:column; gap:12px;">
+                <label>Call Link URL Reference:</label>
+                <input type="text" id="input-q24-calllink" class="input-text" placeholder="https://google.com...">
+                
+                <label>Case Notes Link URL Reference:</label>
+                <input type="text" id="input-q24-caseid" class="input-text" placeholder="https://force.com...">
+            </div>
+
+            <label style="margin-top:15px; display:block;">Were there any TOS violations?</label>
+            <div class="options-grid" id="grid-q24c"></div>
+        </div>
+
+        <!-- Layout Footer Navigation Control Panel -->
+        <div class="wizard-nav">
+            <button class="btn" id="nav-btn-prev" onclick="navigateStep(-1)">Back</button>
+            <button class="btn btn-primary" id="nav-btn-next" onclick="navigateStep(1)">Next</button>
+        </div>
+
+        <!-- Manual Contingency Routing Action Bar -->
+        <div class="override-panel">
+            <button class="btn" style="font-size: 0.75rem; padding: 4px 8px;" onclick="forceOpenCommunications()">🔓 Manually log call links / case notes</button>
+        </div>
+    </div>
+
+    <!-- Active Text Rendering Output Frames -->
+    <div class="panel">
+        <button class="btn btn-copy" onclick="copyToClipboard('eri')">Copy My ERI To Clipboard</button>
+        <div class="preview-box" id="preview-frame-eri">Preview data rendering...</div>
+    </div>
+
+    <div class="panel">
+        <button class="btn btn-copy" style="background-color:#b0c4de;" onclick="copyToClipboard('call')">Copy My Call Template To Clipboard</button>
+        <div class="preview-box" id="preview-frame-call">Preview data rendering...</div>
+    </div>
+
+</div>
+<script>
+        // System Index Routing Sequence Layout 
+    const sequentialWorkflowSteps = [
+        "q0", "q1", "q2", "q3", "q4a", "q4b", "q5", "q6", "q7", "q8", "q9", "q9b", "q10", "q11", "q13", "q12", "q15", "q14", "q16", "q17", "q18", "q19", "q20", "q20b", "q21", "q23", "q24"
+    ];
+    let currentWorkflowIndex = 0;
+    let explicitCommOverrideActive = false;
+
+    // Reactivity State Engine Ingestion Data Store
+    const applicationState = {
+        q0: "", q1: "1 rider", q2: "on trip",
+        q3: { speed: 0, lane: "middle", action: "straight" },
+        q4a: "Ped", q4b: "", q5: "remain stationary", q6: ["nocontact"],
+        q7: "returned to normal", q8: "No", q9: "No", q9b: "", q10: "No", q11: "No",
+        q13: "stayed on scene", q12: "N/A", q15: "none", q14: "none", q16: ["N/A"],
+        q17: "no mission", q18: "none", q19: "returned to normal activity",
+        q20: "zero damage", q20b: "", q21: "N/A",
+        q23: { state: "N/A", plate: "" },
+        q24: { spoke: "N/A", callLink: "", caseId: "", tos: "No" }
+    };
+
+    // Master Mapping Configuration Definitions (Text & Color Output Engine)
+    const optionDefinitions = {
+        q1: [
+            { text: "1 rider", out: "There was a rider present", color: "#11734b" },
+            { text: "riders", out: "There were riders present", color: "#11734b" },
+            { text: "no riders", out: "There were no riders present", color: "#d32f2f" },
+            { text: "driver", out: "There was a driver present", color: "#fbc02d" },
+            { text: "uber rider", out: "There was an UBER rider present", color: "#166c3b" }
+        ],
+        q2: [
+            { text: "on trip", out: ",on the rider's trip.", color: "#2e7d32" },
+            { text: "pickup", out: ",at pickup.", color: "#1976d2" },
+            { text: "dropoff", out: ",at dropoff.", color: "#f57c00" },
+            { text: "driving freely", out: ",while the ADV was driving freely waiting for a mission.", color: "#d32f2f" },
+            { text: "driver route", out: ",on driver's route.", color: "#fbc02d" }
+        ],
+        q3b: [
+            { text: "middle", out: "in middle lanes,", color: "#00796b" },
+            { text: "left lane", out: "in left lane,", color: "#2e7d32" },
+            { text: "right lane", out: "in right lane,", color: "#7b1fa2" },
+            { text: "parked curb", out: "in parked on curb position,", color: "#556b2f" },
+            { text: "intersection", out: "in intersection,", color: "#d32f2f" },
+            { text: "parking lot", out: "in parking lot,", color: "#555555" }
+        ],
+        q3c: [
+            { text: "straight", out: "moving straight.", color: "#1976d2" },
+            { text: "backwards", out: "moving backwards.", color: "#00796b" },
+            { text: "turning right", out: "turning right.", color: "#7b1fa2" },
+            { text: "merging right", out: "merging right.", color: "#555555" },
+            { text: "turning left", out: "turning left.", color: "#556b2f" },
+            { text: "merging left", out: "merging left.", color: "#556b2f" },
+            { text: "stopping ped", out: "stopping for ped.", color: "#2e7d32" },
+            { text: "stopping light", out: "stopping for traffic control.", color: "#1976d2" },
+            { text: "slowing traffic", out: "slowing for traffic.", color: "#00796b" },
+            { text: "stopping traffic", out: "stopping for traffic.", color: "#7b1fa2" },
+            { text: "stopped", out: "stopped.", color: "#555555" },
+            { text: "looping", out: "looping.", color: "#1976d2" }
+        ],
+        q4a: [
+            { text: "Ped" }, { text: "More than one Ped" }, { text: "ORU" }, { text: "VRU" },
+            { text: "LEO/FR" }, { text: "This ADV" }, { text: "Other ADV" }, { text: "an object" }
+        ],
+        q7: [
+            { text: "returned to normal", out: "", color: "#2e7d32" },
+            { text: "WRA dispatched", out: "Following the incident, WRA was dispatched.", color: "#fbc02d" },
+            { text: "tow dispatched", out: "Following the incident, Tow was dispatched.", color: "#f57c00" },
+            { text: "WRA & tow required", out: "Following the incident, WRA was dispatched and Tow was required.", color: "#d32f2f" }
+        ],
+        q8: [
+            { text: "No", out: "", color: "#d32f2f" },
+            { text: "Yes", out: "Spoke with LEO on scene.", color: "#2e7d32" },
+            { text: "LEO present, no contact", out: "LEO Present on scene but no contact made.", color: "#f57c00" }
+        ],
+        q9: [
+            { text: "No", out: "Emergency services were not called.", color: "#ffffff" },
+            { text: "Yes", out: "Emergency services were contacted.", color: "#d32f2f" }
+        ],
+        q10: [
+            { text: "No", out: "", color: "#d32f2f" },
+            { text: "Yes", out: "A manual maneuver was suggested to the ADV.", color: "#2e7d32" }
+        ],
+        q11: [
+            { text: "No", out: "", color: "#d32f2f" },
+            { text: "Yes", out: "A hold was placed on the ADV.", color: "#2e7d32" }
+        ],
+        q13: [
+            { text: "stayed on scene", out: "The involved party stayed on scene.", color: "#11734b" },
+            { text: "left immediately", out: "The involved party left the scene immediately.", color: "#1976d2" },
+            { text: "waited then left", out: "The involved party waited for a little while then left.", color: "#00796b" },
+            { text: "drove off completely", out: "The involved party drove off without stopping at all.", color: "#7b1fa2" },
+            { text: "no involved party", out: "", color: "#556b2f" }
+        ],
+        q12: [
+            { text: "N/A", out: "", color: "#7b1fa2" },
+            { text: "exchanged", out: "Insurance Information was verified exchanged with the ORU.", color: "#2e7d32" },
+            { text: "alert played only", out: "Played insurance exchange alert but cannot verify if information was exchanged with ORU.", color: "#fbc02d" },
+            { text: "no exchange", out: "No insurance information was exchanged with the ORU.", color: "#d32f2f" }
+        ],
+        q15: [
+            { text: "none", out: "No ORU/VRU injuries reported.", color: "#2e7d32" },
+            { text: "minor", out: "Minor ORU/VRU injuries reported.", color: "#d32f2f" },
+            { text: "non-incapacitating", out: "Non-incapacitating ORU/VRU injuries reported.", color: "#7b1fa2" },
+            { text: "incapacitating", out: "Incapacitating ORU/VRU injuries reported.", color: "#d32f2f" },
+            { text: "fatal", out: "Fatal ORU/VRU injuries reported.", color: "#8b0000" },
+            { text: "N/A", out: "", color: "#555555" }
+        ],
+        q14: [
+            { text: "none", out: "No rider injuries reported.", color: "#2e7d32" },
+            { text: "minor", out: "Minor rider injuries reported.", color: "#f57c00" },
+            { text: "non-incapacitating", out: "Non-incapacitating rider injuries reported.", color: "#7b1fa2" },
+            { text: "incapacitating", out: "Incapacitating rider injuries reported.", color: "#d32f2f" },
+            { text: "fatal", out: "Fatal rider injuries reported.", color: "#8b0000" },
+            { text: "no rider present", out: "No rider present.", color: "#11734b" }
+        ],
+        q16: [
+            { text: "N/A", out: "" },
+            { text: "no special requests", out: "made no special requests" },
+            { text: "exit ADV", out: "requested to exit the ADV" },
+            { text: "move ADV", out: "requested to have the ADV moved" },
+            { text: "call 911", out: "requested 911 be called" },
+            { text: "follow up call", out: "requested follow up call" }
+        ],
+        q17: [
+            { text: "no mission", out: "There was no mission.", color: "#11734b" },
+            { text: "continued trip", out: "The trip continued to the destination.", color: "#2e7d32" },
+            { text: "cancelled / re-hailed", out: "The trip was cancelled and the rider re-hailed our service.", color: "#556b2f" },
+            { text: "cancelled / other service", out: "The trip was cancelled and the rider utilized another service.", color: "#1976d2" },
+            { text: "cancelled / walked", out: "The trip was cancelled and the rider walked from the scene.", color: "#00796b" },
+            { text: "cancelled / EMS hospital", out: "The trip was cancelled and the rider was taken to the hospital by EMS.", color: "#7b1fa2" }
+        ],
+        q18: [
+            { text: "none", out: "No financial accommodations were required.", color: "#2e7d32" },
+            { text: "trip waived", out: "The current trip was waived", color: "#555555" },
+            { text: "promo applied", out: "A standard promotion was applied", color: "#556b2f" },
+            { text: "gift card issued", out: "A tremendous gift card was issued", color: "#d4af37" },
+            { text: "waived & promo", out: "The current trip was waived and a promo was applied", color: "#1976d2" },
+            { text: "waived & gift card", out: "The current trip was waived and a gift card was issued", color: "#00796b" },
+            { text: "promo & gift card", out: "A promotional code and a gift card were issued", color: "#7b1fa2" }
+        ],
+        q19: [
+            { text: "returned to normal activity", out: "ADV returned to normal activity", color: "#166c3b" },
+            { text: "continued on mission", out: "The ADV continued on its mission", color: "#2e7d32" },
+            { text: "rtb in manual", out: "The ADV was RTB in Manual", color: "#fbc02d" },
+            { text: "rtb in auto", out: "The ADV was RTB in Auto", color: "#1976d2" },
+            { text: "rtb via tow", out: "The ADV was RTB via Tow", color: "#f57c00" },
+            { text: "seized by police", out: "The ADV was seized by police", color: "#d32f2f" },
+            { text: "third party tow", out: "The ADV was removed via an external third-party tow", color: "#8b0000" }
+        ],
+        q20: [
+            { text: "zero damage", out: "The incident resulted in zero damage.", color: "#2e7d32" },
+            { text: "non-blocking", out: "The incident resulted in non-blocking damage.", color: "#fbc02d" },
+            { text: "blocking", out: "The incident resulted in blocking damage.", color: "#d32f2f" },
+            { text: "tbd", out: "Damage TBD", color: "#555555" }
+            ],
+            q21: [
+            { text: "N/A", out: "" }, { text: "No", out: "" }, { text: "Yes", out: "AZ DPS/ Sky Harbor GTO was notified." }
+            ],
+            q24: [
+            { text: "N/A" }, { text: "No" }, { text: "Yes" }
+            ],
+            q24c: [
+            { text: "N/A" }, { text: "No" }, { text: "Yes" }
+            ]
+            };
+    Object.assign(optionDefinitions, supplementaryOptionDefinitions);
+    // Global Event Handler for Option Toggles and Dynamic Context Changes
+    function selectOption(qId, val) {
+        if (qId === "q16") {
+            handleMultiCheckbox(qId, val);
+            return;
+        }
+
+        applicationState[qId] = val;
+        
+        // Context Validation Side Effects Updates
+        if (qId === "q1") {
+            const lbl = document.getElementById("label-q14");
+            if (val === "driver") {
+                if (lbl) lbl.innerText = "What was the injury status of the driver?";
+            } else {
+                if (lbl) lbl.innerText = "What was the injury status of the rider?";
+            }
+            if (val === "no riders") {
+                applicationState.q2 = "driving freely";
+            }
+        }
+        if (qId === "q2" && val === "driving freely") {
+            applicationState.q1 = "no riders";
+        }
+        if (qId === "q4a") {
+            document.getElementById("label-q4b").innerText = `4b. What did the ${val === "an object" ? "object" : val} do?`;
+        }
+        if (qId === "q17" && val === "no mission") {
+            applicationState.q18 = "none";
+        }
+
+        updateUIElements();
+        compileAllTemplates();
+    }
+
+    function handleMultiCheckbox(qId, val) {
+        let currentArr = applicationState[qId];
+        if (val === "N/A") {
+            currentArr = ["N/A"];
+        } else {
+            currentArr = currentArr.filter(x => x !== "N/A");
+            if (currentArr.includes(val)) {
+                currentArr = currentArr.filter(x => x !== val);
+            } else {
+                currentArr.push(val);
+            }
+            if (currentArr.length === 0) currentArr = ["N/A"];
+        }
+        applicationState[qId] = currentArr;
+        updateUIElements();
+        compileAllTemplates();
+    }
+
+    function adjustSpeed(amount) {
+        let currentSpeed = applicationState.q3.speed;
+        currentSpeed = Math.max(0, currentSpeed + amount);
+        applicationState.q3.speed = currentSpeed;
+        document.getElementById("spinner-speed-val").innerText = currentSpeed;
+        compileAllTemplates();
+    }
+
+    function toggleWireframeRegion(region) {
+        let activeRegions = applicationState.q6.filter(x => x !== "nocontact");
+        if (activeRegions.includes(region)) {
+            activeRegions = activeRegions.filter(x => x !== region);
+        } else {
+            activeRegions.push(region);
+        }
+        if (activeRegions.length === 0) activeRegions = ["nocontact"];
+        applicationState.q6 = activeRegions;
+        updateUIElements();
+        compileAllTemplates();
+    }
+
+    function setWireframeNoContact() {
+        applicationState.q6 = ["nocontact"];
+        updateUIElements();
+        compileAllTemplates();
+    }
+
+    function handlePlateStateChange() {
+        const stateVal = document.getElementById("select-q23-state").value;
+        applicationState.q23.state = stateVal;
+        document.getElementById("wrapper-q23-plate").style.display = (stateVal === "N/A") ? "none" : "block";
+        compileAllTemplates();
+    }
+
+    function forceOpenCommunications() {
+        explicitCommOverrideActive = true;
+        jumpToStepSpecific("q24");
+    }
+    // Core Workflow Routing & Branch/Skip Rules Validator
+    function checkStepShouldBeSkipped(qId) {
+        const isNoRiderContext = (applicationState.q1 === "no riders");
+        const isDriverContext = (applicationState.q1 === "driver");
+        const isNoInvolvedParty = (applicationState.q13 === "no involved party");
+        const agentSelection = applicationState.q4a;
+
+        if (["q14", "q16", "q17", "q18"].includes(qId) && isNoRiderContext) return true;
+        if (["q16", "q17", "q18"].includes(qId) && isDriverContext) return true;
+        if (qId === "q12" && isNoInvolvedParty) return true;
+        if (qId === "q15" && isNoInvolvedParty) return true;
+        if (qId === "q9b" && applicationState.q9 !== "Yes") return true;
+        if (qId === "q20b" && !["blocking", "non-blocking"].includes(applicationState.q20)) return true;
+        
+        if (qId === "q23") {
+            if (agentSelection !== "ORU" && agentSelection !== "VRU") return true;
+        }
+        if (qId === "q24") {
+            if (isNoRiderContext && !explicitCommOverrideActive) return true;
+        }
+        return false;
+    }
+
+    function navigateStep(direction) {
+        let targetIndex = currentWorkflowIndex + direction;
+        while (targetIndex >= 0 && targetIndex < sequentialWorkflowSteps.length) {
+            const checkId = sequentialWorkflowSteps[targetIndex];
+            if (!checkStepShouldBeSkipped(checkId)) {
+                currentWorkflowIndex = targetIndex;
+                break;
+            }
+            targetIndex += direction;
+        }
+        showActiveCard();
+    }
+
+    function jumpToStepSpecific(qId) {
+        const idx = sequentialWorkflowSteps.indexOf(qId);
+        if (idx !== -1) {
+            currentWorkflowIndex = idx;
+            showActiveCard();
+        }
+    }
+
+    function showActiveCard() {
+        const activeQId = sequentialWorkflowSteps[currentWorkflowIndex];
+        
+        // Hide all cards, show active card
+        document.querySelectorAll(".wizard-card").forEach(c => c.classList.remove("active"));
+        const currentTargetCard = document.getElementById(`card-${activeQId}`);
+        if (currentTargetCard) currentTargetCard.classList.add("active");
+
+        // Sync navigation button bounds
+        document.getElementById("nav-btn-prev").style.visibility = (currentWorkflowIndex === 0) ? "hidden" : "visible";
+        document.getElementById("nav-btn-next").innerText = (currentWorkflowIndex === sequentialWorkflowSteps.length - 1) ? "Finish" : "Next";
+
+        updateUIElements();
+    }
+
+    function showActiveCard() {
+        const activeQId = sequentialWorkflowSteps[currentWorkflowIndex];
+        document.querySelectorAll(".wizard-card").forEach(c => c.classList.remove("active"));
+        
+        if (activeQId === "q23") {
+            document.getElementById("card-title-header").innerText = "23. ORU license plate Tracking Parameters";
+        } else {
+            document.getElementById("card-title-header").innerText = cardTitleLookups[activeQId] || "Question Ingestion Engine";
+        }
+        
+        const currentTargetCard = document.getElementById(`card-${activeQId}`);
+        if (currentTargetCard) currentTargetCard.classList.add("active");
+
+        document.getElementById("nav-btn-prev").style.visibility = (currentWorkflowIndex === 0) ? "hidden" : "visible";
+        document.getElementById("nav-btn-next").innerText = (currentWorkflowIndex === sequentialWorkflowSteps.length - 1) ? "Finish" : "Next";
+
+        updateUIElements();
+    }
+    // Sync active selection styles on the screen with database state
+    function updateUIElements() {
+        for (const [qId, val] of Object.entries(applicationState)) {
+            const container = document.getElementById(`grid-${qId}`);
+            if (!container) continue;
+
+            if (Array.isArray(val)) {
+                container.querySelectorAll(".option-btn").forEach(b => {
+                    const bVal = b.getAttribute("data-val");
+                    b.className = val.includes(bVal) ? "option-btn selected" : "option-btn";
+                });
+            } else {
+                container.querySelectorAll(".option-btn").forEach(b => {
+                    b.className = (b.getAttribute("data-val") === val) ? "option-btn selected" : "option-btn";
+                });
+            }
+        }
+
+        // Handle structural wireframe color mapping rules
+        document.querySelectorAll(".car-region").forEach(reg => reg.classList.remove("selected"));
+        document.getElementById("btn-wireframe-nocontact").className = "option-btn";
+        document.getElementById("btn-wireframe-interior").className = "option-btn";
+
+        if (applicationState.q6.includes("nocontact")) {
+            document.getElementById("btn-wireframe-nocontact").className = "option-btn selected";
+        } else {
+            applicationState.q6.forEach(reg => {
+                if (reg === "interior") {
+                    document.getElementById("btn-wireframe-interior").className = "option-btn selected";
+                } else {
+                    const el = document.getElementById(`wf-${reg}`);
+                    if (el) el.classList.add("selected");
+                }
+            });
+        }
+
+        document.getElementById("select-q23-state").value = applicationState.q23.state;
+        document.getElementById("wrapper-q23-plate").style.display = (applicationState.q23.state === "N/A") ? "none" : "block";
+
+        const spokeVal = applicationState.q24.spoke;
+        document.getElementById("wrapper-q24-links").style.display = (spokeVal === "Yes") ? "flex" : "none";
+    }
+
+    // Capture standard data string inputs and apply constraint restrictions
+    function bindInputsToState() {
+        applicationState.q0 = document.getElementById("input-location").value;
+        applicationState.q4b = document.getElementById("input-q4b").value;
+        applicationState.q5 = document.getElementById("input-q5").value;
+        applicationState.q9b = document.getElementById("input-q9b").value;
+        applicationState.q20b = document.getElementById("input-q20b").value;
+        
+        // Strict Alphanumeric Character Filtering Guardrails
+        let rawPlate = document.getElementById("input-q23-plate").value;
+        rawPlate = rawPlate.replace(/[^a-zA-Z0-9]/g, "").substring(0, 8).toUpperCase();
+        document.getElementById("input-q23-plate").value = rawPlate;
+        applicationState.q23.plate = rawPlate;
+
+        applicationState.q24.callLink = document.getElementById("input-q24-calllink").value;
+        applicationState.q24.caseId = document.getElementById("input-q24-caseid").value;
+    }
+    // Primary Core Ingestion Document Compiler Engine
+    function compileAllTemplates() {
+        bindInputsToState();
+        let fragments = [];
+
+        // Q1 and Q2 Chronological Path Generation Loop
+        const optQ1 = optionDefinitions.q1.find(x => x.text === applicationState.q1);
+        const optQ2 = optionDefinitions.q2.find(x => x.text === applicationState.q2);
+        fragments.push({ text: `${optQ1.out} when the event occurred${optQ2.out}`, q: "q1", color: optQ1.color });
+
+        // Q3 Operating Speed and Lane Metric Loops
+        const optQ3b = optionDefinitions.q3b.find(x => x.text === applicationState.q3.lane);
+        const optQ3c = optionDefinitions.q3c.find(x => x.text === applicationState.q3.action);
+        fragments.push({ text: ` Prior to the event the ADV was operating at ${applicationState.q3.speed} MPH ${optQ3b.out} ${optQ3c.out}`, q: "q3", color: optQ3c.color });
+
+        // Q4 External Initiation Variables Checks
+        if (applicationState.q4b.trim() !== "") {
+            fragments.push({ text: ` The incident was initiated when ${applicationState.q4a} ${applicationState.q4b.trim()}.`, q: "q4a", color: "#ffffff" });
+        }
+        
+        // Q5 ADV Corrective System Response Parameter
+        if (applicationState.q5.trim() !== "") {
+            fragments.push({ text: ` The event caused the ADV to ${applicationState.q5.trim()}.`, q: "q5", color: "#ffffff" });
+        }
+
+        // Q6 Multi Select Asset Region Contact Formatter Pluralization Router
+        if (applicationState.q6.includes("nocontact")) {
+            fragments.push({ text: ` This resulted in no physical contact.`, q: "q6", color: "#2e7d32" });
+        } else {
+            const count = applicationState.q6.length;
+            const regionLabelString = count === 1 ? "region" : "regions";
+            let regionsText = applicationState.q6.join(", ");
+            fragments.push({ text: ` This resulted in contact to the ${regionsText} ${regionLabelString}.`, q: "q6", color: "#00fa9a" });
+        }
+
+        // Q7 and Q8 Supplementary Event Interventions Mapping Filters
+        const optQ7 = optionDefinitions.q7.find(x => x.text === applicationState.q7);
+        if (optQ7 && optQ7.out !== "") fragments.push({ text: ` ${optQ7.out}`, q: "q7", color: optQ7.color });
+
+        const optQ8 = optionDefinitions.q8.find(x => x.text === applicationState.q8);
+        if (optQ8 && optQ8.out !== "") fragments.push({ text: ` ${optQ8.out}`, q: "q8", color: optQ8.color });
+
+        // Q9 Emergency Public Infrastructure Integration Check
+        const optQ9 = optionDefinitions.q9.find(x => x.text === applicationState.q9);
+        let q9TextOut = optQ9.out;
+        if (applicationState.q9 === "Yes" && applicationState.q9b.trim() !== "") {
+            q9TextOut = `Emergency services were contacted because ${applicationState.q9b.trim()}.`;
+        }
+        fragments.push({ text: ` ${q9TextOut}`, q: "q9", color: optQ9.color });
+
+        // Q10 Remote Intervention Controls Check
+        const optQ10 = optionDefinitions.q10.find(x => x.text === applicationState.q10);
+        if (optQ10 && optQ10.out !== "") fragments.push({ text: ` ${optQ10.out}`, q: "q10", color: optQ10.color });
+        // Q11 Remote Safety Lock Tracker Check
+        const optQ11 = optionDefinitions.q11.find(x => x.text === applicationState.q11);
+        if (optQ11 && optQ11.out !== "") fragments.push({ text: ` ${optQ11.out}`, q: "q11", color: optQ11.color });
+
+        // Q13 Involved Third Party Track Filter
+        if (!checkStepShouldBeSkipped("q13")) {
+            const optQ13 = optionDefinitions.q13.find(x => x.text === applicationState.q13);
+            if (optQ13 && optQ13.out !== "") fragments.push({ text: ` ${optQ13.out}`, q: "q13", color: optQ13.color });
+        }
+
+        // Q12 Liability Settlement Ingestion Pipeline Check
+        if (!checkStepShouldBeSkipped("q12")) {
+            const optQ12 = optionDefinitions.q12.find(x => x.text === applicationState.q12);
+            if (optQ12 && optQ12.out !== "") fragments.push({ text: ` ${optQ12.out}`, q: "q12", color: optQ12.color });
+        }
+
+        // Q15 External Road Demographics Anomaly Assessment Tracker
+        if (!checkStepShouldBeSkipped("q15")) {
+            const optQ15 = optionDefinitions.q15.find(x => x.text === applicationState.q15);
+            if (optQ15 && optQ15.out !== "") fragments.push({ text: ` ${optQ15.out}`, q: "q15", color: optQ15.color });
+        }
+
+        // Q14 Internal Occupant Asset Trauma Evaluation (Dynamic Driver/Rider String Logic)
+        if (!checkStepShouldBeSkipped("q14")) {
+            let outString = ""; let colorVal = "#2e7d32";
+            if (applicationState.q14 === "none") {
+                outString = applicationState.q1 === "driver" ? "No driver injuries." : "No rider injuries reported.";
+                colorVal = applicationState.q1 === "driver" ? "#fbc02d" : "#2e7d32";
+            } else {
+                const targetObj = optionDefinitions.q14.find(x => x.text === applicationState.q14);
+                outString = targetObj.out; colorVal = targetObj.color;
+            }
+            fragments.push({ text: ` ${outString}`, q: "q14", color: colorVal });
+        }
+
+        // Q16 Multi Checkbox Passenger Request List Conjunction Formatter
+        if (!checkStepShouldBeSkipped("q16") && !applicationState.q16.includes("N/A")) {
+            let actionPhrases = applicationState.q16.map(val => optionDefinitions.q16.find(x => x.text === val).out);
+            fragments.push({ text: ` The rider ${actionPhrases.join(", ")}.`, q: "q16", color: "#f57c00" });
+        }
+
+        // Q17 & Q18 Operational Mission Conclusion & Retentions Routing Checks
+        if (!checkStepShouldBeSkipped("q17")) {
+            const optQ17 = optionDefinitions.q17.find(x => x.text === applicationState.q17);
+            fragments.push({ text: ` ${optQ17.out}`, q: "q17", color: optQ17.color });
+        }
+        if (!checkStepShouldBeSkipped("q18")) {
+            const optQ18 = optionDefinitions.q18.find(x => x.text === applicationState.q18);
+            fragments.push({ text: ` ${optQ18.out}`, q: "q18", color: optQ18.color });
+        }
+
+        // Q19 System Recovery Pipeline Status Map Target
+        const optQ19 = optionDefinitions.q19.find(x => x.text === applicationState.q19);
+        fragments.push({ text: ` ${optQ19.out}.`, q: "q19", color: optQ19.color });
+
+        // Q20 Hardware Discrepancy Classification Parameter Status Target
+        const optQ20 = optionDefinitions.q20.find(x => x.text === applicationState.q20);
+        fragments.push({ text: ` ${optQ20.out}`, q: "q20", color: optQ20.color });
+
+        // Q21 Regional Flight Operational Space Notified
+        if (applicationState.q21 === "Yes") fragments.push({ text: ` AZ DPS/ Sky Harbor GTO was notified.`, q: "q21", color: "#f57c00" });
+
+        // Stream and inject styled narrative element array into Live Output Preview window canvas
+        const previewEriContainer = document.getElementById("preview-frame-eri");
+        previewEriContainer.innerHTML = "Description:";
+        
+        fragments.forEach(f => {
+            const span = document.createElement("span");
+            span.className = "preview-clickable-fragment";
+            span.innerText = f.text;
+            span.style.color = f.color || "#fff";
+            span.style.fontStyle = (f.color === "#d32f2f" || f.color === "#8b0000") ? "italic" : "normal";
+            span.onclick = () => jumpToStepSpecific(f.q);
+            previewEriContainer.appendChild(span);
+        });
+        // -------------------------
+        // 2. THE ERI DATA TAIL OUTPUT BLOCK
+        // -------------------------
+        let tailLines = ["\n"];
+        const printLoc = applicationState.q0.trim() !== "" ? applicationState.q0.trim() : "1080 west addison, chicago, il";
+        tailLines.push(`Location: ${printLoc}`);
+        tailLines.push(`Was emergency services called: ${applicationState.q9}`);
+        tailLines.push(`If Yes: State the reason for the call: ${applicationState.q9 === "Yes" ? (applicationState.q9b.trim() || "N/A") : "N/A"}`);
+        
+        const hasRiderBool = ["1 rider", "riders", "uber rider"].includes(applicationState.q1) ? "Yes" : "No";
+        tailLines.push(`Rider(s): ${hasRiderBool}`);
+        
+        if (checkStepShouldBeSkipped("q14")) tailLines.push("Injuries: No rider present");
+        else tailLines.push(`Injuries: ${applicationState.q14 === "none" ? (applicationState.q1 === "driver" ? "No driver injuries" : "No rider injuries reported") : optionDefinitions.q14.find(x => x.text === applicationState.q14).out}`);
+        
+        tailLines.push("If Yes: State who was injured: N/A", "If Yes: State severity: N/A");
+        
+        if (checkStepShouldBeSkipped("q17")) tailLines.push("Rider(s) Resolution: N/A");
+        else {
+            let trMap = { "continued trip": "Rider(s) Continued Trip", "cancelled / re-hailed": "Re-hailed", "cancelled / other service": "Utilized other service", "cancelled / walked": "Walked", "cancelled / EMS hospital": "EMS / Hospital" };
+            tailLines.push(`Rider(s) Resolution: ${trMap[applicationState.q17] || "N/A"}`);
+        }
+        
+        const dmgBool = ["blocking", "non-blocking"].includes(applicationState.q20) ? "Yes" : (applicationState.q20 === "tbd" ? "TBD" : "No");
+        tailLines.push(`Damage: ${dmgBool}`, `If Yes: Details: ${dmgBool === "Yes" ? (applicationState.q20b.trim() || "N/A") : "N/A"}`);
+        
+        let arMap = { "continued on mission": "Continued on mission", "rtb in manual": "RTB in Manual", "rtb in auto": "RTB in Auto", "rtb via tow": "RTB on Tow", "seized by police": "Seized by police", "third party tow": "External 3rd party tow" };
+        tailLines.push(`ADV Resolution: ${arMap[applicationState.q19] || "Returned to normal"}`);
+
+        if (applicationState.q21 !== "N/A") tailLines.push(`Was AZ DPS/ Sky Harbor GTO called: ${applicationState.q21}`);
+
+        // Restored Original Language Output
+        if (!checkStepShouldBeSkipped("q23") && applicationState.q23.state !== "N/A") {
+            tailLines.push(`*License Plate (ORU): ${applicationState.q23.state} ${(applicationState.q23.plate.trim() || "UNKNOWN")}`);
+        }
+        if (explicitCommOverrideActive || ["1 rider", "riders", "uber rider"].includes(applicationState.q1)) {
+            if (applicationState.q24.callLink.trim() !== "") tailLines.push(`*Call Link: ${applicationState.q24.callLink.trim()}`);
+            if (applicationState.q24.caseId.trim() !== "") tailLines.push(`*Case ID: ${applicationState.q24.caseId.trim()}`);
+        }
+        previewEriContainer.innerText += "\n" + tailLines.join("\n");
+        // -------------------------
+        // 3. THE CALL TEMPLATE DATA BLOCK
+        // -------------------------
+        let callLines = ["Summary of the event :", ""];
+        callLines.push(`Was the trip waived? ${["trip waived", "waived & promo", "waived & gift card"].includes(applicationState.q18) ? "Yes" : "No"}`);
+        callLines.push(`Was the trip canceled? ${applicationState.q17.startsWith("cancelled") ? "Yes" : "No"}`);
+        callLines.push(`Were promo credits issued? ${["promo applied", "gift card issued", "waived & promo", "waived & gift card", "promo & gift card"].includes(applicationState.q18) ? "Yes" : "No"}`);
+        callLines.push(`Was WRA recovery required? ${["WRA dispatched", "WRA & tow required"].includes(applicationState.q7) ? "Yes" : "No"}`);
+        callLines.push(`Any identified rider violations? ${applicationState.q24.tos}`);
+        callLines.push(`Was Supervisor Follow Up requested by rider? ${applicationState.q16.includes("follow up call") ? "Yes" : "No"}`);
+        document.getElementById("preview-frame-call").innerText = callLines.join("\n");
+    }
+
+    // System Clipboard Engine integration
+    function copyToClipboard(target) {
+        const text = document.getElementById(target === 'eri' ? 'preview-frame-eri' : 'preview-frame-call').innerText;
+        navigator.clipboard.writeText(text).then(() => alert(`Data Block Copied.`));
+    }
+
+    // Initialize System Core Run-Time Ingestions loops
+    window.onload = () => {
+        generateOptionGrids(); 
+        showActiveCard(); 
+        compileAllTemplates();
+        document.querySelectorAll('.input-text').forEach(i => i.addEventListener('input', compileAllTemplates));
+    };
+</script>
+</body>
+</html>
+
