@@ -1,0 +1,180 @@
+ORANGE / CONTEXT
+1. Was there a rider present in the vehicle? (C6)
+There were riders present
+There were no riders present
+There was a rider present
+There was a driver present
+There was an UBER rider present
+* (reset/blank)
+2. When in the trip did this incident occur? (C7)
+at pickup
+at dropoff
+on the rider's trip
+while the ADV was driving freely waiting for a mission
+on driver's route
+*
+3a. Speed: (C10)
+0-3 MPH
+4-10 MPH
+11-15 MPH
+16-25 MPH
+26-35 MPH
+36-45 MPH
+46+ MPH
+*
+3b. Lane Position: (C11)
+parked on curb position
+left lane
+middle lanes
+right lane
+intersection
+parking lot
+*
+3c. Direction: (C12)
+moving straight
+moving backwards
+turning right
+merging right
+turning left
+merging left
+stopping for ped
+stopping for traffic control
+slowing for traffic
+stopping for traffic
+stopped
+looping
+*
+4a. Who: (C15)
+Ped
+More than one Ped
+ORU
+VRU
+LEO/FR
+This ADV
+Other ADV
+an object
+N/A
+*
+6. What was the immediate physical contact point? (C21)
+Back
+Front
+Right
+Left
+Undercarriage/ bottom
+Top
+Window
+No contact
+*
+7. What was the post-incident status of the ADV? (C23)
+WRA was dispatched and Tow was required
+WRA was dispatched
+Tow was dispatched
+ADV returned to normal activity
+*
+GREEN / AGENT
+8. Did an agent or safety driver speak with Law Enforcement Officers (LEO) on the scene? (C26)
+Spoke with LEO on scene
+No LEO presence or contact on scene
+LEO Present on scene but no contact made
+*
+9. Was a 911 call initiated? (C28)
+911 was called
+911 was not called
+*
+10. Did ERT suggest a maneuver to the ADV? (C31)
+A manual maneuver was suggested to the ADV
+No manual maneuver was suggested to the ADV
+*
+11. Was a remote or safety hold placed on the ADV following the incident? (C33)
+A hold was placed on the ADV
+No hold was placed on the ADV
+*
+12. Did ERT exchange insurance information with the Other Road User (ORU)? (C35)
+Insurance information was verified exchanged with the ORU
+Played insurance exchange alert but cannot verify if information was exchanged with ORU
+No insurance information was exchanged with the ORU
+N/A
+*
+13. What did the ORU or VRU do immediately following the interaction? (C37)
+The involved party stayed on scene
+The involved party left the scene immediately
+The involved party waited for a little while then left
+The involved party drove off without stopping at all
+There was no involved party
+*
+PINK / RIDER
+14. What was the injury status of the rider? (C40)
+No rider injuries reported
+Minor rider injuries reported
+Non-incapacitating rider injuries reported
+Incapacitating rider injuries reported
+Fatal rider injuries reported
+No rider present
+No driver injuries
+*
+15. What was the injury status of the Other Road User (ORU) or Vulnerable Road User (VRU)? (C42)
+No ORU/VRU injuries reported
+Minor ORU/VRU injuries reported
+Non-incapacitating ORU/VRU injuries reported
+Incapacitating ORU/VRU injuries reported
+Fatal ORU/VRU injuries reported
+N/A
+*
+16. What immediate actions did the rider request due to feeling unsafe? (Allows multiple selections) (C44)
+Requested follow up call
+Requested 911 be called
+Requested to exit the ADV
+Requested to have the ADV moved
+Made no special requests
+N/A
+*
+17. How did the rider officially conclude their trip? (C46)
+The trip continued to the destination
+The trip was cancelled and the rider re-hailed our service
+The trip was cancelled and the rider utilized another service
+The trip was cancelled and the rider walked from the scene
+The trip was cancelled and the rider was taken to the hospital by EMS
+There was no mission
+*
+18. What specific promotions or compensation were applied to the rider's account? (C48)
+The current trip was waived
+A standard promotion was applied
+A tremendous gift card was issued
+The current trip was waived and a promo was applied
+The current trip was waived and a gift card was issued
+A promotional code and a gift card were issued
+No financial accommodations were required
+*
+YELLOW / CONCLUSION
+19. What was the physical resolution and destination for the ADV immediately after the event? (C51)
+The ADV continued on its mission
+The ADV was RTB in Manual
+The ADV was RTB in Auto
+The ADV was RTB via Tow
+The ADV was seized by police
+The ADV was removed via an external third-party tow
+ADV returned to normal activity
+*
+20. ADV Damage Classification: (C53)
+The incident resulted in blocking damage
+The incident resulted in non-blocking damage
+The incident resulted in zero damage
+Damage TBD
+*
+21. Was this specific incident escalated to the on-call operational or safety team? (C56)
+The incident was escalated to on-call
+The incident was not escalated to on-call
+*
+PURPLE / FOLLOW UP
+22. Was AZ DPS/ Sky harbor called? (C59)
+Yes
+No
+N/A
+*
+23a. ORU LP STATE: (C62)
+AL, AK, AZ, AR, CA, CO, CT, DE, FL, GA, HI, ID, IL, IN, IA, KS, KY, LA, ME, MD, MA, MI, MN, MS, MO, MT, NE, NV, NH, NJ, NM, NY, NC, ND, OH, OK, OR, PA, RI, SC, SD, TN, UT, VT, VA, WA, WV, WI, WY
+UNKNOWN
+N/A
+24c. Were there any TOS violations? (C67)
+Yes
+No
